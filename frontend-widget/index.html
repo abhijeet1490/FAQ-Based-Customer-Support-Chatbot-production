@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Chatbot Test Page</title>
+     <link rel="stylesheet" href="style.css">
+     <style>
+         /* Added style for the close button */
+         #chat-header {
+             background-color: #007bff;
+             color: white;
+             padding: 15px;
+             font-size: 18px;
+             font-weight: bold;
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+         }
+
+         #close-button {
+             background: none;
+             border: none;
+             color: white;
+             font-size: 24px;
+             cursor: pointer;
+             padding: 0;
+             line-height: 1;
+         }
+
+         #close-button:hover {
+             color: #ddd;
+         }
+     </style>
+ </head>
+ <body>
+     <h1>My Awesome Website</h1>
+     <p>This is a test page to develop our chatbot widget.</p>
+
+     <div id="chatbot-container">
+         <div id="chat-bubble">💬</div>
+         <div id="chat-window" class="hidden">
+             <div id="chat-header">
+                 Chat with Us
+                 <button id="close-button">×</button>
+             </div>
+             <div id="chat-messages"></div>
+             <form id="chat-form">
+                 <input type="text" id="chat-input" placeholder="Type a message..." required>
+                 <button type="submit">Send</button>
+             </form>
+         </div>
+     </div>
+
+     <script src="script.js"></script>
+ </body>
+ </html>
