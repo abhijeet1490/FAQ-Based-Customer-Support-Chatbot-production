@@ -1,159 +1,128 @@
-# FAQ Chatbot (Django + Vanilla JS Widget)
+# FAQ-Based Customer Support Chatbot
 
-A lightweight, development-ready FAQ chatbot with a Django REST API backend and a drop‑in frontend widget. Type a question, the API finds the best matching FAQ using simple keyword logic, and responds instantly. Ideal for rapid prototyping and local demos.
+A robust, production-ready Django API tailored to provide instant, automated customer support. The system efficiently parses incoming queries, retrieves relevant Frequently Asked Questions using keyword matching, and dynamically handles unresolvable queries by automatically creating and assigning support tickets to human agents.
 
----
+## 🚀 Features
+- **Intelligent Query Matching:** Processes user inputs against predefined, localized FAQs.
+- **Automated Ticket Generation:** Generates a persistent database record for unmatched queries to ensure no inquiry is missed.
+- **RESTful Architecture:** Built on Django REST Framework (DRF) for clean, composable JSON API endpoints.
+- **Production Tuned:** Configured with `WhiteNoise` for efficient static file serving, `python-dotenv` for secure 12-factor configuration, and `Gunicorn` as a rock-solid WSGI server.
+- **Interactive Web Client:** Includes a vanilla HTML/CSS/JS frontend widget for seamless testing and demonstration.
 
-## Features
-- Simple Django REST API endpoint: `/api/v1/chat/`
-- FAQ model with keywords for quick matching
-- Vanilla JS widget you can embed in any static page
-- CORS enabled for local development
-- Chat history persisted per tab via `sessionStorage`
-- Widget starts closed (bubble only); opens on bubble click
-
----
-
-## Quickstart
-
-### 1) Clone and enter the project
-```bash
-git clone <your-repo-url>
-cd faq-chatbot
-```
-
-### 2) Create and activate a virtual environment (recommended)
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3) Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4) Apply migrations
-```bash
-python manage.py migrate
-```
-
-### 5) (Optional) Create a superuser to access Django Admin
-```bash
-python manage.py createsuperuser
-```
-
-### 6) Run the development server
-```bash
-python manage.py runserver
-```
-
-Backend is now live at `http://127.0.0.1:8000/`.
+## 💻 Tech Stack
+- **Backend Core:** Python 3.10, Django 5.1.x, Django REST Framework
+- **Frontend Integrations:** Vanilla HTML5, CSS3, JavaScript
+- **DevOps & Infrastructure:** Gunicorn, WhiteNoise, bash script automation
+- **Database:** SQLite (Configured to quickly migrate to PostgreSQL via `dj-database-url` in standard deployments)
 
 ---
 
-## Seed some FAQs
-Use the Django Admin or the shell to create FAQs so the chatbot can answer.
+## 🛠 Local Setup
 
-### Using Django Admin
-1. Visit `http://127.0.0.1:8000/admin/`
-2. Log in with your superuser
-3. Add entries under `FAQs`
-   - Question: e.g., "How do I reset my password?"
-   - Answer: e.g., "Go to Settings → Security → Reset Password."
-   - Keywords (comma-separated): e.g., `reset,password,account`
+### Prerequisites
+- Python 3.10+
+- Git
 
-### Using Django Shell
-```bash
-python manage.py shell
-```
-```python
-from api.models import FAQ
-FAQ.objects.create(
-    question="How do I reset my password?",
-    answer="Go to Settings → Security → Reset Password.",
-    keywords="reset,password,account"
-)
-```
+### Installation
+1. **Clone the repository:**
+   ```bash
+   git clone <repository_url>
+   cd FAQ-Based-Customer-Support-Chatbot-production
+   ```
 
----
+2. **Create a virtual environment and install dependencies:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
 
-## Try the Frontend Widget
+3. **Configure Environment Variables:**
+   See the [Environment Variables Setup](#-environment-variables-setup) section below.
 
-1. Start the backend: `python manage.py runserver`
-2. Open `frontend-widget/index.html` in your browser (double-click to open or drag into a tab)
-3. Click the chat bubble (bottom-right) to open the window, type a question, hit Send
+4. **Run Database Migrations:**
+   ```bash
+   python manage.py migrate
+   ```
 
-The widget posts to `http://127.0.0.1:8000/api/v1/chat/` and renders the answer. CORS is enabled for dev.
-
-Tip: Keep your browser console open to see network logs and any errors.
+5. **Start the Development Server:**
+   ```bash
+   python manage.py runserver
+   ```
+   *The interactive widget is accessible by opening the `./frontend-widget/index.html` file in your browser.*
 
 ---
 
-## Widget behavior
-- Initial state: only the bubble is visible; the chat window stays hidden until clicked.
-- Close behavior: clicking × hides the window and shows the bubble again.
-- Persistence: messages are saved in `sessionStorage` and restored on reload within the same tab/session.
-- Fallback handling: if the question isn’t found in the FAQ, the widget shows a fallback response (e.g., ticket creation) and stays open. Conversation history is preserved.
+## 🔐 Environment Variables Setup
 
----
-
-## Commands Overview
+Create a `.env` file in the root repository directory. This ensures the protection of secrets on production servers.
 
 ```bash
-# Create venv
-python3 -m venv venv
+# Keep this key strictly confidential!
+SECRET_KEY=your_secure_randomly_generated_long_string
 
-# Activate venv (macOS/Linux)
-source venv/bin/activate
+# For Local Development set to 'True'. Ensure it is 'False' in production.
+DEBUG=False
 
-# Install deps
-pip install -r requirements.txt
-
-# DB setup
-python manage.py migrate
-
-# Run server
-python manage.py runserver
-
-# (Optional) Create admin user
-python manage.py createsuperuser
+# Optional: Add DATABASE_URL to migrate off SQLite (PostgreSQL URL expected)
+# DATABASE_URL=postgres://user:password@hostname:5432/dbname
 ```
 
 ---
 
-## Project Structure
+## ☁️ Render Deployment Steps
 
+Deploying to [Render.com](https://render.com) is quick and highly automated in this project.
+
+### Option A: Infrastructure as Code (Recommended)
+This repository includes a `render.yaml` configuration that allows Render to auto-configure itself.
+1. Push this code to a new repository on GitHub.
+2. Log in to the Render Dashboard.
+3. Click **New** -> **Blueprint**.
+4. Connect your GitHub repository.
+5. Render will detect the Web Service structure, provision the container, use the local `./build.sh` script, and gracefully start the server via Gunicorn. 
+
+### Option B: Manual Setup via Render UI
+1. Go to the Render Dashboard and click **New** -> **Web Service**.
+2. Connect your GitHub repository.
+3. Configure the essential details:
+    - **Language:** Python 3
+    - **Build Command:** `./build.sh`
+    - **Start Command:** `gunicorn backend.wsgi:application`
+4. Expand **Environment Variables** and add:
+    - `PYTHON_VERSION` : `3.10.13`
+    - `SECRET_KEY` : *(Generate a long, random string of characters)*
+    - `DEBUG` : `False`
+5. Click **Deploy Web Service**.
+
+> **Note on Render Persistence:** Free tier machines use ephemeral storage. Modifying `backend/settings.py` to accept PostgreSQL using `dj-database-url` is highly recommended for persistent data in a production scale.
+
+---
+
+## 📡 Example API Usage
+
+The backend API handles all the heavy lifting and can be utilized independently as a microservice.
+
+### `POST /api/v1/chat/`
+Send a user inquiry inside a JSON payload body to receive the correct response from the chatbot or trigger a support ticket.
+
+**Request:**
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/chat/ \
+     -H "Content-Type: application/json" \
+     -d '{"message": "What are your business hours?"}'
 ```
-faq-chatbot/
-  api/                 # Django app (models, views, serializers, urls)
-  backend/             # Django project settings and root urls
-  frontend-widget/     # Drop-in HTML/CSS/JS widget
-  manage.py            # Django CLI entry point
-  requirements.txt     # Python dependencies
+
+**Response (Successful Match):**
+```json
+{
+    "answer": "Our business hours are Monday through Friday, 9:00 AM to 5:00 PM EST."
+}
 ```
 
----
-
-## Notes for Development
-- This project is configured for local development: `DEBUG=True`, permissive CORS.
-- The matching is keyword-based and simplistic; punctuation and multi-word phrases may need refinement.
-- The widget controls the bubble/window visibility itself; avoid adding duplicate click/submit handlers elsewhere.
-
----
-
-## Troubleshooting
-- If you see a CORS or network error, confirm the server is running at `127.0.0.1:8000`.
-- If responses are always the default, check your FAQ `keywords` and add more entries.
-- If the chat window closes/minimizes unexpectedly:
-  - Hard refresh with cache bypass (Cmd/Ctrl+Shift+R).
-  - Ensure there are no duplicate event listeners or scripts re-rendering `#chatbot-container`.
-  - Check for global key/click handlers in your host page that might hide elements.
-  - Clear `sessionStorage` for the tab and retry.
-- Check the browser console for fetch errors and the Django server logs for request traces.
-
----
-
-## License
-For development and prototyping. Customize and adapt as needed.
-
+**Response (Fallback - Auto-generated Ticket):**
+```json
+{
+    "answer": "I couldn't find an answer for your question. I have created a support ticket for you. Your ticket number is: 1ab8e2ef... A human agent will get back to you shortly."
+}
+```
